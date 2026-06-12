@@ -31,7 +31,7 @@ export const createSale = async (req, res) => {
 
             await SaleItem.create({
                 SaleId: newSale.id, 
-                ProductId: realProductId, 
+                ProductId: realProductId,
                 productName: item.name,   
                 quantity: item.quantity,
                 price: item.price,
@@ -67,7 +67,7 @@ export const createSale = async (req, res) => {
     }
 };
 
-// 🌟 Iniciar caja del día (Arrancar caja)
+
 export const startCashSession = async (req, res) => {
     try {
         const { initialCash } = req.body;
@@ -85,7 +85,6 @@ export const startCashSession = async (req, res) => {
     }
 };
 
-// 🌟 Obtener estado de la caja abierta y cálculos automáticos en tiempo real
 export const getActiveCashSession = async (req, res) => {
     try {
         const activeBox = await CashSession.findOne({ where: { status: 'OPEN' } });
@@ -125,7 +124,7 @@ export const getActiveCashSession = async (req, res) => {
                 totalPropinas,
                 totalConsumo,
                 granTotal: efectivo + tarjeta + transferencia,
-                efectivoEsperadoEnCaja: parseFloat(activeBox.initialCash) + efectivo // Fondo inicial + Ventas en efectivo
+                efectivoEsperadoEnCaja: parseFloat(activeBox.initialCash) + efectivo 
             }
         });
     } catch (error) {
@@ -133,7 +132,6 @@ export const getActiveCashSession = async (req, res) => {
     }
 };
 
-// 🌟 Cierre definitivo de caja (Corte de caja)
 export const closeCashSession = async (req, res) => {
     try {
         const activeBox = await CashSession.findOne({ where: { status: 'OPEN' } });
@@ -149,7 +147,6 @@ export const closeCashSession = async (req, res) => {
     }
 };
 
-// Historial Completo
 export const getSalesHistory = async (req, res) => {
     try {
         const sales = await Sale.findAll({
@@ -163,7 +160,6 @@ export const getSalesHistory = async (req, res) => {
     }
 };
 
-// Marcar como pagado
 export const markSaleAsPaid = async (req, res) => {
     const { id } = req.params; 
     try {
@@ -179,7 +175,6 @@ export const markSaleAsPaid = async (req, res) => {
     }
 };
 
-// Resetear Sistema completo
 export const resetSystemHistory = async (req, res) => {
     const t = await sequelize.transaction();
     try {
