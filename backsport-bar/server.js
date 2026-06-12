@@ -23,13 +23,11 @@ import expenseRoutes from './routes/expenseRoutes.js';
 dotenv.config();           
 
 const app = express();
-const PORT = process.env.PORT || 10000; // En Render se suele usar el 10000 por defecto
+const PORT = process.env.PORT || 10000; 
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Relaciones/Asociaciones de la BD
 Sale.hasMany(SaleItem, { onDelete: 'CASCADE' });
 SaleItem.belongsTo(Sale);
 
@@ -39,37 +37,39 @@ SaleItem.belongsTo(Product);
 Product.hasMany(ProductHistory, { onDelete: 'CASCADE' });
 ProductHistory.belongsTo(Product);
 
-// Rutas de la API
 app.use('/api/products', productRoutes);
 app.use('/api/sales', saleRoutes); 
 app.use('/api/auth', authRoutes);
 app.use('/api/maintenance', maintenanceRoutes); 
 app.use('/api/expenses', expenseRoutes); 
 
-// Ruta de salud (Opcional, pero ayuda a Render a saber que el servicio está vivo)
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
-// Función asíncrona para inicializar todo en el orden correcto
 const startServer = async () => {
     try {
-        // 1. Conectar a la base de datos
+        
         await connectDB();
 
-        // 2. Sincronizar las tablas (Crear o alterar tablas en Hostinger si no existen)
         console.log('⏳ Sincronizando tablas con Hostinger...');
         await sequelize.sync({ alter: true });
         console.log('✅ Tablas creadas/actualizadas con éxito en la BD.');
 
-        // 3. Levantar el servidor Express una vez que todo lo anterior sea exitoso
+        try {
+            await sequelize.query("ALTER TABLE Sales AUTO_INCREMENT = 10000;");
+            console.log('🔢 Contador de folios inicializado con éxito en 10000.');
+        } catch (dbError) {
+            
+            console.log('ℹ️ Nota sobre Folio:', dbError.message);
+        }
+
         app.listen(PORT, () => {
-            console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+            console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
         });
 
     } catch (error) {
         console.error('❌ Error crítico al iniciar el backend:', error);
-        process.exit(1); // Detiene el proceso si no hay base de datos
+        process.exit(1); 
     }
 };
 
-// Arrancar nuestra aplicación
 startServer();
